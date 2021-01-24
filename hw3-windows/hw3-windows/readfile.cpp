@@ -21,14 +21,7 @@
 /*****************************************************************************/
 
 // Basic includes to get this file to work.  
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <deque>
-#include <stack>
-#include "Transform.h" 
-#include <glm/gtx/string_cast.hpp>
+
 
 using namespace std;
 #include "readfile.h"
@@ -68,6 +61,7 @@ void readfile(const char* filename)
         // I need to implement a matrix stack to store transforms.  
         // This is done using standard STL Templates 
         stack <mat4> transfstack; 
+        numused = 0;
         transfstack.push(mat4(1.0));  // identity
 
         getline (in, str); 
@@ -76,49 +70,126 @@ void readfile(const char* filename)
                 // Ruled out comment and blank lines 
 
                 stringstream s(str);
-                s >> cmd; 
-                int i; 
+                s >> cmd;
                 float values[10]; // Position and color for light, colors for others
-                                    // Up to 10 params for cameras.  
+                                  // Up to 10 params for cameras.  
                 bool validinput; // Validity of input 
 
+
                 // Process the light, add it to database.
-                // Lighting Command
-                if (cmd == "light") {
-                    
-                    validinput = readvals(s, 8, values); // Position/color for lts.
+                // Vertex Command
+                if (cmd == "vertex") {
+                    validinput = readvals(s, 3, values); // Position/color for lts.
                     if (validinput) {
-
-                            
-                        // Note that values[0...7] shows the read in values 
-                        // Make use of lightposn[] and lightcolor[] arrays in variables.h
-                        // Those arrays can then be used in display too.  
-
+                        vertices.emplace_back(glm::vec4(values[0], values[1], values[2], 1.f));
                     }
-                    
                 }
+                else if (cmd == "tri") {
+                    validinput = readvals(s, 3, values); // Position/color for lts.
+                    if (validinput) {
+                        glm::vec4 v0 = vertices[(int)values[0]];
+                        glm::vec4 v1 = vertices[(int)values[1]];
+                        glm::vec4 v2 = vertices[(int)values[2]];
 
+                        Triangle tri_ = Triangle(v0, v1, v2);
+                        tri_.ambient = ambient;
+                        tri_.specular = specular;
+                        tri_.emission = emission;
+                        tri_.diffuse = diffuse;
+                        tri_.shininess = shininess;
+                        tri_.setTransfTri(transfstack.top());
+                        triangles.push_back(tri_);
+                    }
+                }
+                else if (cmd == "sphere") {
+                    validinput = readvals(s, 4, values); // Position/color for lts.
+                    if (validinput) {
+                        Sphere sph_(glm::vec3(values[0], values[1], values[2]), values[3]);
+                        sph_.ambient = ambient;
+                        sph_.specular = specular;
+                        sph_.emission = emission;
+                        sph_.diffuse = diffuse;
+                        sph_.shininess = shininess;
+                        sph_.transform = transfstack.top();
+                        spheres.push_back(sph_);
+                    }
+                }
                 // Material Commands 
                 // Ambient, diffuse, specular, shininess properties for each object.
                 // Filling this in is pretty straightforward, so I've left it in 
                 // the skeleton, also as a hint of how to do the more complex ones.
                 // Note that no transforms/stacks are applied to the colors. 
-
-               else if (cmd == "size") {
-                    validinput = readvals(s,2,values); 
-                    if (validinput) { 
-                        w = (int) values[0]; h = (int) values[1]; 
-                    } 
-               } else if (cmd == "camera") {
-                    validinput = readvals(s,10,values); // 10 values eye cen up fov
+                else if (cmd == "ambient") {
+                    validinput = readvals(s, 3, values);
+                    if (validinput) {
+                        ambient = glm::vec3(values[0], values[1], values[2]);
+                    }
+                }
+                else if (cmd == "diffuse") {
+                    validinput = readvals(s, 3, values);
+                    if (validinput) {
+                        diffuse = glm::vec3(values[0], values[1], values[2]);
+                    }
+                }
+                else if (cmd == "specular") {
+                    validinput = readvals(s, 3, values);
+                    if (validinput) {
+                        specular = glm::vec3(values[0], values[1], values[2]);
+                    }
+                }
+                else if (cmd == "emission") {
+                    validinput = readvals(s, 3, values);
+                    if (validinput) {
+                        emission = glm::vec3(values[0], values[1], values[2]);
+                    }
+                }
+                else if (cmd == "shininess") {
+                    validinput = readvals(s, 1, values);
+                    if (validinput) {
+                        shininess = values[0];
+                    }
+                }
+                else if (cmd == "attenuation") {
+                    validinput = readvals(s, 3, values);
+                    if (validinput) {
+                        attenuation = glm::vec3(values[0], values[1], values[2]);
+                    }
+                }
+                else if (cmd == "output") {
+                    s >> OutFilename;
+                }
+                else if (cmd == "size") {
+                    validinput = readvals(s, 2, values);
+                    if (validinput) {
+                        width = (int)values[0]; height = (int)values[1];
+                    }
+                else if (cmd == "maxverts") {
+                    validinput = readvals(s, 1, values);
+                    if (validinput) {
+                        maxVerts = values[0];
+                    }
+                }
+                else if (cmd == "maxdepth") {
+                    validinput = readvals(s, 1, values);
+                    if (validinput) {
+                        maxDepth = values[0];
+                    }
+                }
+                else if (cmd == "maxvertsnorm") {
+                    validinput = readvals(s, 1, values);
+                    if (validinput) {
+                        maxVertsNorm = values[0];
+                    }
+                }
+                else if (cmd == "camera") {
+                    validinput = readvals(s, 10, values); // 10 values eye cen up fov
                     if (validinput) {
 
-                        // YOUR CODE FOR HW 2 HERE
                         // Use all of values[0...9]
                         // You may need to use the upvector fn in Transform.cpp
                         // to set up correctly. 
                         // Set eyeinit upinit center fovy in variables.h 
-                        
+
                         eyeinit.x = values[0]; // lookfromx;
                         eyeinit.y = values[1]; // lookfromy;
                         eyeinit.z = values[2]; // lookfromz;
@@ -135,92 +206,87 @@ void readfile(const char* filename)
                         fovy = values[9];
                     }
                 }
-
-                // I've left the code for loading objects in the skeleton, so 
-                // you can get a sense of how this works.  
-                // Also look at demo.txt to get a sense of why things are done this way.
-                else if (cmd == "sphere" || cmd == "cube" || cmd == "teapot") {
-                    
-                    validinput = readvals(s, 1, values); 
-                    if (validinput) {
-                    }
-                     
-                }
-
                 else if (cmd == "translate") {
-                    validinput = readvals(s,3,values); 
+                    validinput = readvals(s, 3, values);
                     if (validinput) {
-
-                        // YOUR CODE FOR HW 2 HERE.  
-                        // Think about how the transformation stack is affected
-                        // You might want to use helper functions on top of file. 
-                        // Also keep in mind what order your matrix is!
                         const glm::mat4 M = Transform::translate(values[0], values[1], values[2]);
-
                         rightmultiply(M, transfstack);
-
                     }
                 }
                 else if (cmd == "scale") {
-                    validinput = readvals(s,3,values); 
+                    validinput = readvals(s, 3, values);
                     if (validinput) {
-
-                        // YOUR CODE FOR HW 2 HERE.  
-                        // Think about how the transformation stack is affected
-                        // You might want to use helper functions on top of file.  
-                        // Also keep in mind what order your matrix is!
                         const glm::mat4 M = Transform::scale(values[0], values[1], values[2]);
-
                         rightmultiply(M, transfstack);
                     }
                 }
                 else if (cmd == "rotate") {
-                    validinput = readvals(s,4,values); 
+                    validinput = readvals(s, 4, values);
                     if (validinput) {
-
-                        // YOUR CODE FOR HW 2 HERE. 
-                        // values[0..2] are the axis, values[3] is the angle.  
-                        // You may want to normalize the axis (or in Transform::rotate)
-                        // See how the stack is affected, as above.  
-                        // Note that rotate returns a mat3. 
-                        // Also keep in mind what order your matrix is!
                         const glm::vec3 axis_ = glm::normalize(glm::vec3(values[0], values[1], values[2]));
                         const float angle = values[3]; // degrees
                         glm::mat4 M = glm::transpose(glm::mat4(Transform::rotate(angle, axis_)));
-                        
+
                         rightmultiply(M, transfstack);
                     }
                 }
+                else if (cmd == "directional" || cmd == "point") {
+                    if (numused >= numLights) {
+                        cerr << "Reached Maximum Number of Lights " << numused << " Will ignore further lights\n";
+                        continue;
+                    }
+                    else {
+                        validinput = readvals(s, 6, values);
+                        if (validinput) {
+                            // light position:
+                            lightposn[4 * numused] = values[0]; // x
+                            lightposn[4 * numused + 1] = values[1]; // y
+                            lightposn[4 * numused + 2] = values[2]; // z
+                            if (cmd == "point")
+                                lightposn[4 * numused + 3] = 1.f; // w
+                            else
+                                lightposn[4 * numused + 3] = 0.f; // w
 
-                // I include the basic push/pop code for matrix stacks
-                else if (cmd == "pushTransform") {
-                    transfstack.push(transfstack.top()); 
-                } else if (cmd == "popTransform") {
-                    if (transfstack.size() <= 1) {
-                        cerr << "Stack has no elements.  Cannot Pop\n"; 
-                    } else {
-                        transfstack.pop(); 
+                            // light color
+                            lightcolor[4 * numused] = values[4]; // r
+                            lightcolor[4 * numused + 1] = values[5]; // g
+                            lightcolor[4 * numused + 2] = values[6]; // b
+                            lightcolor[4 * numused + 3] = 1.f; // a
+
+                            ++numused;
+                        }
+
                     }
                 }
-
-                else {
-                    cerr << "Unknown Command: " << cmd << " Skipping \n"; 
+                // I include the basic push/pop code for matrix stacks
+                else if (cmd == "pushTransform") {
+                    transfstack.push(transfstack.top());
                 }
+                else if (cmd == "popTransform") {
+                    if (transfstack.size() <= 1) {
+                        cerr << "Stack has no elements.  Cannot Pop\n";
+                    }
+                    else {
+                        transfstack.pop();
+                    }
+                }
+                else {
+                    cerr << "Unknown Command: " << cmd << " Skipping \n";
+                }
+                }
+                getline(in, str);
             }
-            getline (in, str); 
+
+            // Set up initial position for eye, up and amount
+            // As well as booleans 
+
+            eye = eyeinit;
+            up = upinit;
+            sx = sy = 1.0;  // keyboard controlled scales in x and y 
+            tx = ty = 0.0;  // keyboard controllled translation in x and y  
+
+
         }
-
-        // Set up initial position for eye, up and amount
-        // As well as booleans 
-
-        eye = eyeinit; 
-        up = upinit; 
-        amount = 5;
-        sx = sy = 1.0;  // keyboard controlled scales in x and y 
-        tx = ty = 0.0;  // keyboard controllled translation in x and y  
-    
-
-        
     } else {
         cerr << "Unable to Open Input Data File " << filename << "\n"; 
         throw 2; 

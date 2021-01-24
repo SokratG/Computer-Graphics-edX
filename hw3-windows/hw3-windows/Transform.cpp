@@ -6,8 +6,6 @@
 
 #include "Transform.h"
 #include <glm/gtc/reciprocal.inl>
-#include <glm/gtx/string_cast.hpp>
-#include <iostream>
 
 // Helper rotation function.  Please implement this.  
 mat3 Transform::rotate(const float degrees, const vec3& axis) 

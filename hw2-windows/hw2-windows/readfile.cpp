@@ -106,9 +106,6 @@ void readfile(const char* filename)
                             // Make use of lightposn[] and lightcolor[] arrays in variables.h
                             // Those arrays can then be used in display too.  
 
-                            if (numused > numLights)
-                                continue;
-
                             // light position:
                             lightposn[4 * numused] = values[0]; // x
                             lightposn[4 * numused + 1] = values[1]; // y
