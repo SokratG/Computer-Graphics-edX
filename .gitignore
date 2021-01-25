@@ -1,4 +1,4 @@
-hw0-windows/
+hw0-windows/.vs/
 hw1-windows/.vs/
 hw2-windows/.vs/
 hw3-windows/.vs/
@@ -9,4 +9,5 @@ hw1-windows/packages/
 hw3-windows/hw3-windows/packages/
 hw3-windows/hw3-windows/Debug/
 mytest-windows/
+hw3-windows/
 *.jpg
