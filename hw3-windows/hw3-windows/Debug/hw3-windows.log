@@ -1,0 +1,15 @@
+﻿  main.cpp
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\include\Transform.h(22,29): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\main.cpp(115,17): warning C4838: conversion from 'float' to 'BYTE' requires a narrowing conversion
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\main.cpp(115,17): warning C4244: 'initializing': conversion from 'float' to 'BYTE', possible loss of data
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\main.cpp(115,22): warning C4838: conversion from 'float' to 'BYTE' requires a narrowing conversion
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\main.cpp(115,22): warning C4244: 'initializing': conversion from 'float' to 'BYTE', possible loss of data
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\main.cpp(115,27): warning C4838: conversion from 'float' to 'BYTE' requires a narrowing conversion
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\main.cpp(115,27): warning C4244: 'initializing': conversion from 'float' to 'BYTE', possible loss of data
+  readfile.cpp
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\include\Transform.h(22,29): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\readfile.cpp(169,44): warning C4244: '=': conversion from 'float' to 'size_t', possible loss of data
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\readfile.cpp(175,44): warning C4244: '=': conversion from 'float' to 'size_t', possible loss of data
+D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\readfile.cpp(181,48): warning C4244: '=': conversion from 'float' to 'size_t', possible loss of data
+  Generating Code...
+  hw3-windows.vcxproj -> D:\Courses\ComputerGraphic\hw3-windows\hw3-windows\Debug\hw3-windows.exe

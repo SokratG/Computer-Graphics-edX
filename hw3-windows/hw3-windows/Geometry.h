@@ -8,9 +8,21 @@ enum shape { sphere, triangle };
 #pragma warning(disable : 26812)
 struct TypeShape {
 public:
-	shape shape_;
-	TypeShape(shape shp_) : shape_(shp_){}
+	shape typeshape;
+	TypeShape(shape shp_) : typeshape(shp_){}
+	virtual glm::vec3 getNormal(glm::vec3 p0) = 0{
+	}
+};
 #pragma warning(pop)
+
+
+using IntersectionInfo = struct IntersectionInfo_
+{
+	bool isIntersect = false;
+	TypeShape* shape_ = nullptr;
+	glm::vec3 vec_intersec;
+	glm::vec3 normal;
+	float dist = 0.f;
 };
 
 struct Triangle : public TypeShape {
@@ -22,7 +34,7 @@ public:
 	float shininess = 0.f;
 	glm::mat4 transform = glm::mat4(1.f);
 	Triangle(const glm::vec4 p1, const glm::vec4 p2, const glm::vec4 p3) : TypeShape(shape::triangle), P1(p1), P2(p2), P3(p3) { recalcNormal(); }
-	glm::vec3 getTriNormal() { return TriNormal; }
+	
 	glm::vec4 getP1() const { return P1; }
 	glm::vec4 getP2() const { return P2; }
 	glm::vec4 getP3() const { return P3; }
@@ -33,8 +45,12 @@ public:
 		transform = m;
 		recalcNormal(apply_);
 	}
-	glm::vec3 getTriNormal() const { return TriNormal; }
+	glm::vec3 getNormal(glm::vec3 p0) override { return getTriNormal(); }
+	IntersectionInfo getIntersect(const glm::vec3& P0, const glm::vec3& dir) {
+		return IntersectionInfo();
+	}
 private:
+	glm::vec3 getTriNormal() const { return TriNormal; }
 	void recalcNormal(bool useTransf=false) {
 		if (useTransf) {
 			P1 = transform * P1;
@@ -61,7 +77,17 @@ public:
 	float shininess = 0.f;
 	glm::mat4 transform = glm::mat4(1.f);
 	Sphere(glm::vec3 c, float r) : TypeShape(shape::sphere), center(c), radius(r) {}
+	glm::vec3 getNormal(glm::vec3 p0) override { return getSphNormal(p0); }
 
+	IntersectionInfo getIntersect(const glm::vec3& P0, const glm::vec3& dir) {
+
+
+		return IntersectionInfo();
+	}
+
+	glm::vec3 getCenter() const { return center; }
+	float gerRad() const { return radius; }
+private:
 	glm::vec3 getSphNormal(const glm::vec3& P) {
 		glm::vec4 P_ = glm::inverse(transform) * glm::vec4(P.x, P.y, P.z, 1.f);
 		glm::vec3 dehP = (glm::vec3(P_.x, P.y, P.z) / P_.w); // dehomogeneous 
@@ -70,9 +96,6 @@ public:
 		normal = glm::normalize(glm::vec3(sphnormal.x, sphnormal.y, sphnormal.z));
 		return normal;
 	}
-	glm::vec3 getCenter() const { return center; }
-	float gerRad() const { return radius; }
-private:
 	glm::vec3 center;
 	float radius;
 };
