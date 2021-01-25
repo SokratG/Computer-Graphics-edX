@@ -1,9 +1,6 @@
 ## UC San DiegoX CSE167x Computer Graphics
 ### <a href="https://www.edx.org/course/computer-graphics-2">Course link</a>
 
-### Homework 0 (Compilation)
-<img src="hw0-windows/hw0-windows/screenshot2.png">
-
 ### Homework 1 (Transformations and Viewing)
 <img src="hw1-windows/hw1-windows/input.txt.010.png">
 
